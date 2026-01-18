@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>English for Meat Industry</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+      min-height: 100%;
+      padding: 16px;
+      padding-bottom: 30px;
+    }
+    .container { max-width: 500px; margin: 0 auto; }
+    
+    .header { text-align: center; margin-bottom: 24px; }
+    .header h1 { font-size: 22px; color: #312e81; margin-bottom: 4px; }
+    .header p { color: #6366f1; font-size: 14px; }
+    .header .subtitle { color: #6b7280; font-size: 12px; margin-top: 6px; }
+    
+    /* Menu */
+    .module-card {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .module-header { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .module-icon { font-size: 28px; }
+    .module-title { font-weight: 700; color: #1f2937; font-size: 15px; }
+    .module-subtitle { font-size: 12px; color: #6b7280; }
+    .module-count { font-size: 12px; color: #9ca3af; margin-bottom: 12px; }
+    .btn-group { display: flex; gap: 8px; }
+    .btn {
+      flex: 1;
+      padding: 12px 14px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-appearance: none;
+    }
+    .btn-learn { background: #6366f1; color: white; }
+    .btn-quiz { background: #22c55e; color: white; }
+    
+    .tips {
+      background: white;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      margin-top: 16px;
+    }
+    .tips h3 { font-weight: 700; color: #1f2937; margin-bottom: 10px; font-size: 15px; }
+    .tips li { font-size: 13px; color: #4b5563; margin-bottom: 6px; list-style: none; }
+    
+    /* Study View */
+    .study-view { display: none; }
+    .study-view.active { display: block; }
+    .menu-view.hidden { display: none; }
+    
+    .back-btn {
+      background: none;
+      border: none;
+      color: #6366f1;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px 0;
+      margin-bottom: 12px;
+    }
+    
+    .progress-bar { background: #e5e7eb; height: 6px; border-radius: 3px; margin-bottom: 6px; overflow: hidden; }
+    .progress-fill { background: #6366f1; height: 100%; transition: width 0.3s; }
+    .progress-text { display: flex; justify-content: space-between; font-size: 12px; color: #6b7280; margin-bottom: 16px; }
+    .score { color: #22c55e; font-weight: 700; }
+    
+    /* Flashcard */
+    .flashcard {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    .card-label { font-size: 12px; color: #9ca3af; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .card-word { font-size: 26px; font-weight: 700; color: #1f2937; margin-bottom: 8px; line-height: 1.3; }
+    .card-word.english { color: #6366f1; }
+    .card-pronunciation { font-size: 18px; color: #6b7280; margin-bottom: 16px; }
+    .card-hint { font-size: 12px; color: #d1d5db; }
+    
+    /* Quiz */
+    .quiz-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .quiz-question { font-size: 12px; color: #9ca3af; margin-bottom: 8px; text-align: center; text-transform: uppercase; letter-spacing: 1px; }
+    .quiz-word { font-size: 22px; font-weight: 700; color: #1f2937; margin-bottom: 20px; text-align: center; line-height: 1.3; }
+    .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+    .quiz-option {
+      padding: 16px;
+      background: #f3f4f6;
+      border: 2px solid transparent;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 500;
+      text-align: left;
+      cursor: pointer;
+      -webkit-appearance: none;
+      transition: all 0.15s;
+    }
+    .quiz-option.correct { background: #22c55e; color: white; border-color: #16a34a; }
+    .quiz-option.incorrect { background: #ef4444; color: white; border-color: #dc2626; }
+    .quiz-option.disabled { pointer-events: none; }
+    .quiz-option.faded { opacity: 0.5; }
+    
+    .result-box { margin-top: 16px; padding: 14px; border-radius: 10px; display: none; }
+    .result-box.show { display: block; }
+    .result-box.correct { background: #dcfce7; }
+    .result-box.incorrect { background: #fee2e2; }
+    .result-text { font-weight: 700; margin-bottom: 4px; font-size: 15px; }
+    .result-text.correct { color: #166534; }
+    .result-text.incorrect { color: #991b1b; }
+    .result-answer { font-size: 14px; color: #4b5563; }
+    
+    /* Navigation */
+    .nav-buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
+    .nav-btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      -webkit-appearance: none;
+    }
+    .nav-btn.prev { background: white; color: #6366f1; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .nav-btn.next { background: #6366f1; color: white; }
+    .nav-btn.complete { background: #22c55e; }
+    .nav-btn:disabled { background: #e5e7eb; color: #9ca3af; box-shadow: none; }
+    
+    /* Final Score */
+    .final-score {
+      background: white;
+      border-radius: 16px;
+      padding: 28px 20px;
+      text-align: center;
+      margin-top: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      display: none;
+    }
+    .final-score.show { display: block; }
+    .final-score h3 { font-size: 20px; color: #1f2937; margin-bottom: 8px; }
+    .final-score .big-score { font-size: 42px; font-weight: 700; color: #6366f1; }
+    .final-score .message { color: #6b7280; margin-top: 8px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- MENU -->
+    <div class="menu-view" id="menuView">
+      <div class="header">
+        <h1>🥓 English for Meat Industry</h1>
+        <p>Inglés para la Industria Cárnica</p>
+        <p class="subtitle">Nivel: Principiante • 6 Módulos • 72 Palabras</p>
+      </div>
+      <div id="menuGrid"></div>
+      <div class="tips">
+        <h3>💡 Tips para aprender</h3>
+        <ul>
+          <li>• <b>Aprende:</b> Toca la tarjeta para voltearla</li>
+          <li>• <b>Quiz:</b> Selecciona la respuesta correcta</li>
+          <li>• <b>10-15 min/día</b> es mejor que 1 hora/semana</li>
+        </ul>
+      </div>
+    </div>
+    
+    <!-- STUDY -->
+    <div class="study-view" id="studyView">
+      <button class="back-btn" id="backBtn">← Volver</button>
+      
+      <div class="progress-text">
+        <span id="moduleTitle"></span>
+        <span><span id="currentNum">1</span>/<span id="totalNum">12</span></span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div id="scoreRow" class="progress-text" style="display:none;">
+        <span></span>
+        <span class="score">Puntos: <span id="scoreNum">0</span></span>
+      </div>
+      
+      <!-- Learn -->
+      <div id="learnMode">
+        <div class="flashcard" id="flashcard">
+          <div id="cardContent"></div>
+        </div>
+      </div>
+      
+      <!-- Quiz -->
+      <div id="quizMode" style="display:none;">
+        <div class="quiz-card">
+          <p class="quiz-question">¿Cómo se dice en inglés?</p>
+          <p class="quiz-word" id="quizWord"></p>
+          <div class="quiz-options" id="quizOptions"></div>
+          <div class="result-box" id="resultBox">
+            <p class="result-text" id="resultText"></p>
+            <p class="result-answer" id="resultAnswer"></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="nav-buttons">
+        <button class="nav-btn prev" id="prevBtn">← Anterior</button>
+        <button class="nav-btn next" id="nextBtn">Siguiente →</button>
+      </div>
+      
+      <div class="final-score" id="finalScore">
+        <h3>🎉 ¡Completado!</h3>
+        <p class="big-score"><span id="finalScoreNum">0</span>/<span id="finalTotal">12</span></p>
+        <p class="message" id="finalMessage"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const modules = [
+      { id: 1, title: "Cortes y Productos", icon: "🥩", words: [
+        { en: "Ham", es: "Jamón", pron: "jam" },
+        { en: "Sausage", es: "Embutido / Salchicha", pron: "SÓ-sich" },
+        { en: "Bologna", es: "Mortadela", pron: "buh-LÓU-nuh" },
+        { en: "Salami", es: "Salami", pron: "suh-LÁ-mi" },
+        { en: "Bacon", es: "Tocino", pron: "BÉI-kon" },
+        { en: "Pork", es: "Cerdo", pron: "pork" },
+        { en: "Beef", es: "Res", pron: "bif" },
+        { en: "Chicken", es: "Pollo", pron: "CHÍ-ken" },
+        { en: "Ground meat", es: "Carne molida", pron: "graund mit" },
+        { en: "Cured meat", es: "Carne curada", pron: "kiurd mit" },
+        { en: "Smoked meat", es: "Carne ahumada", pron: "smóukt mit" },
+        { en: "Cold cuts", es: "Fiambres", pron: "cóuld kots" }
+      ]},
+      { id: 2, title: "Equipos", icon: "⚙️", words: [
+        { en: "Grinder", es: "Molino / Moledora", pron: "GRÁIN-der" },
+        { en: "Mixer", es: "Mezcladora", pron: "MÍK-ser" },
+        { en: "Stuffer", es: "Embutidora", pron: "STÓ-fer" },
+        { en: "Smoker", es: "Ahumador", pron: "SMÓU-ker" },
+        { en: "Slicer", es: "Rebanadora", pron: "SLÁI-ser" },
+        { en: "Scale", es: "Báscula", pron: "skeil" },
+        { en: "Vacuum sealer", es: "Selladora al vacío", pron: "VÁ-kium SÍ-ler" },
+        { en: "Refrigerator", es: "Refrigerador", pron: "ri-FRÍ-yer-ei-tor" },
+        { en: "Freezer", es: "Congelador", pron: "FRÍ-zer" },
+        { en: "Conveyor belt", es: "Banda transportadora", pron: "kon-VÉI-or belt" },
+        { en: "Casing", es: "Tripa / Funda", pron: "KÉI-sing" },
+        { en: "Blade", es: "Cuchilla", pron: "bléid" }
+      ]},
+      { id: 3, title: "Procesos", icon: "🏭", words: [
+        { en: "To grind", es: "Moler", pron: "tu gráind" },
+        { en: "To mix", es: "Mezclar", pron: "tu miks" },
+        { en: "To stuff", es: "Embutir", pron: "tu stof" },
+        { en: "To cure", es: "Curar", pron: "tu kiur" },
+        { en: "To smoke", es: "Ahumar", pron: "tu smóuk" },
+        { en: "To slice", es: "Rebanar", pron: "tu sláis" },
+        { en: "To package", es: "Empacar", pron: "tu PÁ-kech" },
+        { en: "To weigh", es: "Pesar", pron: "tu uéi" },
+        { en: "To label", es: "Etiquetar", pron: "tu LÉI-bel" },
+        { en: "To refrigerate", es: "Refrigerar", pron: "tu ri-FRÍ-yer-eit" },
+        { en: "To freeze", es: "Congelar", pron: "tu friz" },
+        { en: "Batch", es: "Lote", pron: "bach" }
+      ]},
+      { id: 4, title: "Calidad y Seguridad", icon: "✅", words: [
+        { en: "Expiration date", es: "Fecha de vencimiento", pron: "eks-pi-RÉI-shon deit" },
+        { en: "Shelf life", es: "Vida útil", pron: "shelf láif" },
+        { en: "Temperature", es: "Temperatura", pron: "TÉM-pre-chur" },
+        { en: "Hygiene", es: "Higiene", pron: "JÁI-yin" },
+        { en: "Sanitation", es: "Sanitización", pron: "sa-ni-TÉI-shon" },
+        { en: "Contamination", es: "Contaminación", pron: "kon-ta-mi-NÉI-shon" },
+        { en: "Food safety", es: "Inocuidad", pron: "fud SÉIF-ti" },
+        { en: "Quality control", es: "Control de calidad", pron: "KUÁ-li-ti kon-TRÓL" },
+        { en: "Inspection", es: "Inspección", pron: "ins-PÉK-shon" },
+        { en: "Standards", es: "Estándares", pron: "STÁN-dards" },
+        { en: "Traceability", es: "Trazabilidad", pron: "treis-a-BÍ-li-ti" },
+        { en: "Recall", es: "Retiro del mercado", pron: "ri-KÓL" }
+      ]},
+      { id: 5, title: "Ingredientes", icon: "🧂", words: [
+        { en: "Salt", es: "Sal", pron: "solt" },
+        { en: "Spices", es: "Especias", pron: "SPÁI-ses" },
+        { en: "Pepper", es: "Pimienta", pron: "PÉ-per" },
+        { en: "Garlic", es: "Ajo", pron: "GÁR-lik" },
+        { en: "Preservatives", es: "Conservantes", pron: "pri-SÉR-va-tivs" },
+        { en: "Nitrates", es: "Nitratos", pron: "NÁI-treits" },
+        { en: "Sodium", es: "Sodio", pron: "SÓU-dium" },
+        { en: "Fat", es: "Grasa", pron: "fat" },
+        { en: "Lean meat", es: "Carne magra", pron: "lin mit" },
+        { en: "Binder", es: "Ligante", pron: "BÁIN-der" },
+        { en: "Filler", es: "Relleno", pron: "FÍ-ler" },
+        { en: "Water", es: "Agua", pron: "UÁ-ter" }
+      ]},
+      { id: 6, title: "Frases Comunes", icon: "💬", words: [
+        { en: "Check the temperature", es: "Revisar la temperatura", pron: "chek de TÉM-pre-chur" },
+        { en: "Start the machine", es: "Encender la máquina", pron: "start de ma-SHÍN" },
+        { en: "Stop the line", es: "Parar la línea", pron: "stop de láin" },
+        { en: "Clean the equipment", es: "Limpiar el equipo", pron: "klin de i-KUÍP-ment" },
+        { en: "Weigh the batch", es: "Pesar el lote", pron: "uéi de bach" },
+        { en: "Label the product", es: "Etiquetar el producto", pron: "LÉI-bel de PRÓ-dokt" },
+        { en: "Store in refrigerator", es: "Almacenar en refrigerador", pron: "stor in ri-FRÍ-yer-ei-tor" },
+        { en: "Out of stock", es: "Agotado", pron: "aut of stok" },
+        { en: "Ready for shipping", es: "Listo para envío", pron: "RÉ-di for SHÍ-ping" },
+        { en: "Quality approved", es: "Calidad aprobada", pron: "KUÁ-li-ti a-PRÚVD" },
+        { en: "Maintenance required", es: "Requiere mantenimiento", pron: "MÉIN-te-nans ri-KUÁIRD" },
+        { en: "Safety first", es: "La seguridad primero", pron: "SÉIF-ti ferst" }
+      ]}
+    ];
+
+    let currentModule = null;
+    let currentCard = 0;
+    let isFlipped = false;
+    let mode = 'learn';
+    let score = 0;
+    let quizAnswers = [];
+    let answered = false;
+
+    function renderMenu() {
+      const grid = document.getElementById('menuGrid');
+      grid.innerHTML = modules.map(m => `
+        <div class="module-card">
+          <div class="module-header">
+            <span class="module-icon">${m.icon}</span>
+            <div>
+              <div class="module-title">${m.title}</div>
+              <div class="module-subtitle">${m.words.length} palabras</div>
+            </div>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn-learn" data-id="${m.id}" data-mode="learn">📚 Aprender</button>
+            <button class="btn btn-quiz" data-id="${m.id}" data-mode="quiz">🎯 Quiz</button>
+          </div>
+        </div>
+      `).join('');
+      
+      grid.querySelectorAll('.btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          startModule(parseInt(this.dataset.id), this.dataset.mode);
+        });
+      });
+    }
+
+    function startModule(id, selectedMode) {
+      currentModule = modules.find(m => m.id === id);
+      currentCard = 0;
+      isFlipped = false;
+      mode = selectedMode;
+      score = 0;
+      answered = false;
+      
+      document.getElementById('menuView').classList.add('hidden');
+      document.getElementById('studyView').classList.add('active');
+      document.getElementById('learnMode').style.display = mode === 'learn' ? 'block' : 'none';
+      document.getElementById('quizMode').style.display = mode === 'quiz' ? 'block' : 'none';
+      document.getElementById('scoreRow').style.display = mode === 'quiz' ? 'flex' : 'none';
+      document.getElementById('finalScore').classList.remove('show');
+      document.getElementById('moduleTitle').textContent = currentModule.icon + ' ' + currentModule.title;
+      
+      updateCard();
+    }
+
+    function backToMenu() {
+      document.getElementById('menuView').classList.remove('hidden');
+      document.getElementById('studyView').classList.remove('active');
+    }
+
+    function updateCard() {
+      const word = currentModule.words[currentCard];
+      const total = currentModule.words.length;
+      
+      document.getElementById('currentNum').textContent = currentCard + 1;
+      document.getElementById('totalNum').textContent = total;
+      document.getElementById('progressFill').style.width = ((currentCard + 1) / total * 100) + '%';
+      
+      if (mode === 'learn') {
+        showCardFront(word);
+        isFlipped = false;
+      } else {
+        document.getElementById('quizWord').textContent = word.es;
+        generateQuizOptions();
+        document.getElementById('resultBox').classList.remove('show');
+        answered = false;
+      }
+      
+      document.getElementById('scoreNum').textContent = score;
+      document.getElementById('prevBtn').disabled = currentCard === 0;
+      
+      const nextBtn = document.getElementById('nextBtn');
+      if (currentCard === total - 1) {
+        nextBtn.textContent = '✓ Completar';
+        nextBtn.classList.add('complete');
+      } else {
+        nextBtn.textContent = 'Siguiente →';
+        nextBtn.classList.remove('complete');
+      }
+      nextBtn.disabled = mode === 'quiz' && !answered;
+    }
+
+    function showCardFront(word) {
+      document.getElementById('cardContent').innerHTML = `
+        <p class="card-label">Español</p>
+        <p class="card-word">${word.es}</p>
+        <p class="card-hint">👆 Toca para ver en inglés</p>
+      `;
+    }
+
+    function showCardBack(word) {
+      document.getElementById('cardContent').innerHTML = `
+        <p class="card-label">English</p>
+        <p class="card-word english">${word.en}</p>
+        <p class="card-pronunciation">/${word.pron}/</p>
+        <p class="card-hint">👆 Toca para ver español</p>
+      `;
+    }
+
+    function flipCard() {
+      if (mode !== 'learn') return;
+      const word = currentModule.words[currentCard];
+      isFlipped = !isFlipped;
+      if (isFlipped) {
+        showCardBack(word);
+      } else {
+        showCardFront(word);
+      }
+    }
+
+    function generateQuizOptions() {
+      const correct = currentModule.words[currentCard];
+      const others = currentModule.words.filter((_, i) => i !== currentCard);
+      const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
+      quizAnswers = [...shuffled, correct].sort(() => Math.random() - 0.5);
+      
+      const container = document.getElementById('quizOptions');
+      container.innerHTML = quizAnswers.map((a, i) => 
+        `<button class="quiz-option" data-index="${i}">${a.en}</button>`
+      ).join('');
+      
+      container.querySelectorAll('.quiz-option').forEach(opt => {
+        opt.addEventListener('click', function() {
+          selectAnswer(parseInt(this.dataset.index));
+        });
+      });
+    }
+
+    function selectAnswer(index) {
+      if (answered) return;
+      answered = true;
+      
+      const correct = currentModule.words[currentCard];
+      const selected = quizAnswers[index];
+      const isCorrect = selected.en === correct.en;
+      
+      if (isCorrect) score++;
+      document.getElementById('scoreNum').textContent = score;
+      
+      const options = document.querySelectorAll('.quiz-option');
+      options.forEach((opt, i) => {
+        opt.classList.add('disabled');
+        if (quizAnswers[i].en === correct.en) {
+          opt.classList.add('correct');
+        } else if (i === index && !isCorrect) {
+          opt.classList.add('incorrect');
+        } else {
+          opt.classList.add('faded');
+        }
+      });
+      
+      const resultBox = document.getElementById('resultBox');
+      resultBox.className = 'result-box show ' + (isCorrect ? 'correct' : 'incorrect');
+      document.getElementById('resultText').className = 'result-text ' + (isCorrect ? 'correct' : 'incorrect');
+      document.getElementById('resultText').textContent = isCorrect ? '✅ ¡Correcto!' : '❌ Incorrecto';
+      document.getElementById('resultAnswer').innerHTML = '<b>' + correct.en + '</b> /' + correct.pron + '/';
+      
+      document.getElementById('nextBtn').disabled = false;
+    }
+
+    function nextCard() {
+      if (currentCard < currentModule.words.length - 1) {
+        currentCard++;
+        updateCard();
+      } else {
+        if (mode === 'quiz') {
+          showFinalScore();
+        } else {
+          backToMenu();
+        }
+      }
+    }
+
+    function prevCard() {
+      if (currentCard > 0) {
+        currentCard--;
+        answered = mode === 'learn';
+        updateCard();
+      }
+    }
+
+    function showFinalScore() {
+      const total = currentModule.words.length;
+      document.getElementById('finalScoreNum').textContent = score;
+      document.getElementById('finalTotal').textContent = total;
+      
+      let msg = score === total ? '¡Perfecto! 🌟' : score >= total * 0.7 ? '¡Muy bien! 👏' : 'Sigue practicando 💪';
+      document.getElementById('finalMessage').textContent = msg;
+      document.getElementById('finalScore').classList.add('show');
+    }
+
+    // Event listeners
+    document.getElementById('backBtn').addEventListener('click', backToMenu);
+    document.getElementById('flashcard').addEventListener('click', flipCard);
+    document.getElementById('prevBtn').addEventListener('click', prevCard);
+    document.getElementById('nextBtn').addEventListener('click', nextCard);
+
+    renderMenu();
+  </script>
+</body>
+</html>
